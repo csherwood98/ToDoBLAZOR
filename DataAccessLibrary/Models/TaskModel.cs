@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLibrary
+namespace DataAccessLibrary.Models
 {
-    class TaskData
+    public class TaskModel
     {
         /// <summary>
         /// Unique identifier for the task.
@@ -35,10 +35,10 @@ namespace DataAccessLibrary
         /// <summary>
         /// List of tags associated with the task, may be empty.
         /// </summary>
-        public List<TagData> Tags { get; set; }
+        public List<TagModel> Tags { get; set; }
         /// <summary>
         /// List of subtasks associated with the task, may be empty.
         /// </summary>
-        public List<SubtaskData> Subtasks { get; set; }
+        public List<SubtaskModel> Subtasks { get; set; }
     }
 }

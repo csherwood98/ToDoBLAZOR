@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLibrary
+namespace DataAccessLibrary.Models
 {
-    class TagData
+    public class TagModel
     {
         /// <summary>
         /// Unique identifier for the tag.

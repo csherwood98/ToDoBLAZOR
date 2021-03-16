@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLibrary
+namespace DataAccessLibrary.Models
 {
-    class SubtaskData
+    public class SubtaskModel
     {
         /// <summary>
         /// Unique identifier of the subtask

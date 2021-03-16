@@ -1,3 +1,4 @@
+using DataAccessLibrary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +28,8 @@ namespace ToDoBLAZOR
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            services.AddTransient<ITasksData, TasksData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

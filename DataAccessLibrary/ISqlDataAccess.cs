@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DataAccessLibrary.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary
@@ -9,5 +10,6 @@ namespace DataAccessLibrary
 
         Task<List<T>> LoadData<T, U>(string sql, U parameters);
         Task SaveData<T>(string sql, T parameters);
+        List<TaskModel> Tasks_GetAll();
     }
 }

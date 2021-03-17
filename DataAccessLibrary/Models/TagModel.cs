@@ -15,6 +15,6 @@ namespace DataAccessLibrary.Models
         /// <summary>
         /// Name of the tag. Uniqueness enforced by the creation function.
         /// </summary>
-        public int Name { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DataAccessLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,34 @@ namespace DataAccessLibrary
 
         public string ConnectionStringName { get; set; } = "Default";
 
+
         public SqlDataAccess(IConfiguration config)
         {
             _config = config;
         }
 
+        public List<TaskModel> Tasks_GetAll()
+        {
+            List<TaskModel> output;
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                output = connection.Query<TaskModel>("dbo.spTasks_GetAll").ToList();
+
+                foreach (TaskModel t in output)
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@ParentTaskId", t.Id);
+                    
+                    t.Subtasks = connection.Query<SubtaskModel>("dbo.spSubtasks_GetByTask", p, commandType: CommandType.StoredProcedure).ToList();
+
+                    t.Tags = connection.Query<TagModel>("dbo.spTags_GetByTask", p, commandType: CommandType.StoredProcedure).ToList();
+                }
+            }
+
+            return output;
+        }
         public async Task<List<T>> LoadData<T, U>(string sql, U parameters)
         {
             string connectionString = _config.GetConnectionString(ConnectionStringName);

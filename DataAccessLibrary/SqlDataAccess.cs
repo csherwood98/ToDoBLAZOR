@@ -45,6 +45,105 @@ namespace DataAccessLibrary
 
             return output;
         }
+
+        public List<TagModel> Tags_GetAll()
+        {
+            List<TagModel> output;
+
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                output = connection.Query<TagModel>("dbo.spTags_GetAll").ToList();
+            }
+
+            return output;
+        }
+
+        public void CreateTask(TaskModel model)
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                //Save the task itself
+                SaveTask(connection, model);
+                //Save the subtasks
+                SaveSubtasks(connection, model);
+                //Save the tags OR associate pre-existing tag IDs to the current one.
+                SaveTags(connection, model);
+                //Link up tags with the task
+                LinkTags(connection, model);
+            }
+        }
+
+        private void SaveTask(IDbConnection connection, TaskModel model)
+        {
+            var p = new DynamicParameters();
+            p.Add("@Description", model.Description);
+            p.Add("@Priority", model.Priority);
+            p.Add("@DueDate", model.DueDate);
+            p.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("dbo.spTasks_Insert", p, commandType: CommandType.StoredProcedure);
+
+            model.Id = p.Get<int>("@id");
+        }
+
+        private void SaveSubtasks(IDbConnection connection, TaskModel model)
+        {
+            foreach(SubtaskModel stm in model.Subtasks)
+            {
+                var p = new DynamicParameters();
+                p.Add("@Description", stm.Description);
+                p.Add("@ParentTaskId", model.Id);
+
+                connection.Execute("dbo.spSubtasks_Insert");
+            }
+        }
+
+        private void SaveTags(IDbConnection connection, TaskModel model)
+        {
+            // Gets the already existing list of tags
+            List<TagModel> existingTags = Tags_GetAll();
+
+            foreach(TagModel tm in model.Tags)
+            {
+                //Checks for duplicate tag and if they already exist, assign id from preexisting tag
+                int idFinder = existingTags.FindIndex(x => x.Name == tm.Name);
+                if (idFinder != -1)
+                {
+                    tm.Id = existingTags[idFinder].Id;
+                }
+                else
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Name", tm.Name);
+                    p.Add("@id", 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+                    connection.Execute("dbo.spTags_Insert", p, commandType: CommandType.StoredProcedure);
+
+                    tm.Id = p.Get<int>("@id");
+                }
+            }
+        }
+        /// <summary>
+        /// Associates the Tag IDs with the Task ID within the SQL database for display purposes.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="model"></param>
+        private void LinkTags(IDbConnection connection, TaskModel model)
+        {
+            foreach(TagModel tm in model.Tags)
+            {
+                var p = new DynamicParameters();
+                p.Add("@TaskId", model.Id);
+                p.Add("@TagId", tm.Id);
+
+                connection.Execute("dbo.spTaskTags_InsertLink");
+            }
+        }
+
         public async Task<List<T>> LoadData<T, U>(string sql, U parameters)
         {
             string connectionString = _config.GetConnectionString(ConnectionStringName);

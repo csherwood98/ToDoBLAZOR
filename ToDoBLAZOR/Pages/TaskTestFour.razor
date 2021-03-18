@@ -53,6 +53,9 @@
                         }
                     }
                 </td>
+                <td>
+                    <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
+                </td>
             </tr>
             }
     </tbody>
@@ -62,7 +65,22 @@
 @code {
     [CascadingParameter] public IModalService Modal { get; set; }
 
-    void AddModal() => Modal.Show<AddTask>("Add Model");
+
+    async Task AddModal()
+    {
+        var formModal = Modal.Show<AddTask>("Add Model");
+        var result = await formModal.Result;
+        if (!result.Cancelled && result is not null)
+        {
+            tasks.Add((TaskModel)result.Data);
+        }
+    }
+
+    private void OnDelete(int Id)
+    {
+        _db.DeleteTask(Id);
+        tasks.RemoveAll(x => x.Id == Id);
+    }
 
     private List<TaskModel> tasks;
 

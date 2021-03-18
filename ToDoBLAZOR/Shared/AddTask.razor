@@ -95,6 +95,8 @@
     {
 
         _db.CreateTask(newTask);
+
+        BlazoredModal.CloseAsync(ModalResult.Ok(newTask));
     }
 
 

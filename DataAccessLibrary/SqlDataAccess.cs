@@ -14,7 +14,7 @@ namespace DataAccessLibrary
     public class SqlDataAccess : ISqlDataAccess
     {
         private readonly IConfiguration _config;
-
+        //Go through and make sure public and private are used consistently
         public string ConnectionStringName { get; set; } = "Default";
 
 
@@ -160,6 +160,21 @@ namespace DataAccessLibrary
 
                 connection.Execute("dbo.spTaskTags_InsertLink", p, commandType:CommandType.StoredProcedure);
             }
+        }
+
+        public void DeleteTask(int Id)
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                var p = new DynamicParameters();
+                p.Add("@Id", Id);
+
+                connection.Execute("dbo.spTasks_DeleteById", p, commandType: CommandType.StoredProcedure);
+            }
+
+
         }
 
         public async Task<List<T>> LoadData<T, U>(string sql, U parameters)

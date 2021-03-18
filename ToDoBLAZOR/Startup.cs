@@ -17,6 +17,8 @@ namespace ToDoBLAZOR
     public class Startup
     {
         //TODO: Fix due date input form so that it isn't extremely clunky
+        //TODO: Make it so that page updates with tasks added without a refresh
+        //TODO: Make the modal add form more adjustable, make the subtask/tag area take up less space
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

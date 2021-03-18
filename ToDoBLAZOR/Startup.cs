@@ -10,11 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blazored.Modal;
 
 namespace ToDoBLAZOR
 {
     public class Startup
     {
+        //TODO: Fix due date input form so that it isn't extremely clunky
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +30,7 @@ namespace ToDoBLAZOR
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazoredModal();
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<ITasksData, TasksData>();
         }

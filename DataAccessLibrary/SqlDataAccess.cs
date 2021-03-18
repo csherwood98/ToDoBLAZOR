@@ -36,7 +36,7 @@ namespace DataAccessLibrary
                 {
                     var p = new DynamicParameters();
                     p.Add("@ParentTaskId", t.Id);
-                    
+
                     t.Subtasks = connection.Query<SubtaskModel>("dbo.spSubtasks_GetByTask", p, commandType: CommandType.StoredProcedure).ToList();
 
                     t.Tags = connection.Query<TagModel>("dbo.spTags_GetByTask", p, commandType: CommandType.StoredProcedure).ToList();
@@ -92,22 +92,33 @@ namespace DataAccessLibrary
 
         private void SaveSubtasks(IDbConnection connection, TaskModel model)
         {
-            foreach(SubtaskModel stm in model.Subtasks)
+            //Nullcheck & empty list check
+            if (model.Subtasks is null || model.Subtasks.Count == 0)
+            {
+                return;
+            }
+            
+            foreach (SubtaskModel stm in model.Subtasks)
             {
                 var p = new DynamicParameters();
                 p.Add("@Description", stm.Description);
                 p.Add("@ParentTaskId", model.Id);
 
-                connection.Execute("dbo.spSubtasks_Insert");
+                connection.Execute("dbo.spSubtasks_Insert", p, commandType:CommandType.StoredProcedure);
             }
         }
 
         private void SaveTags(IDbConnection connection, TaskModel model)
         {
+            //Nullcheck & empty list check
+            if (model.Tags is null || model.Tags.Count == 0)
+            {
+                return;
+            }
             // Gets the already existing list of tags
             List<TagModel> existingTags = Tags_GetAll();
 
-            foreach(TagModel tm in model.Tags)
+            foreach (TagModel tm in model.Tags)
             {
                 //Checks for duplicate tag and if they already exist, assign id from preexisting tag
                 int idFinder = existingTags.FindIndex(x => x.Name == tm.Name);
@@ -124,6 +135,7 @@ namespace DataAccessLibrary
                     connection.Execute("dbo.spTags_Insert", p, commandType: CommandType.StoredProcedure);
 
                     tm.Id = p.Get<int>("@id");
+                    existingTags.Add(tm);
                 }
             }
         }
@@ -134,13 +146,19 @@ namespace DataAccessLibrary
         /// <param name="model"></param>
         private void LinkTags(IDbConnection connection, TaskModel model)
         {
-            foreach(TagModel tm in model.Tags)
+            //Nullcheck & empty list check
+            if (model.Tags is null || model.Tags.Count == 0)
+            {
+                return;
+            }
+
+            foreach (TagModel tm in model.Tags)
             {
                 var p = new DynamicParameters();
                 p.Add("@TaskId", model.Id);
                 p.Add("@TagId", tm.Id);
 
-                connection.Execute("dbo.spTaskTags_InsertLink");
+                connection.Execute("dbo.spTaskTags_InsertLink", p, commandType:CommandType.StoredProcedure);
             }
         }
 

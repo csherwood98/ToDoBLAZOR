@@ -1,7 +1,9 @@
-﻿<div>
+﻿@inject ISqlDataAccess _db
+
+<div>
     <EditForm Model="@newTask" OnValidSubmit="@HandleValidSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label for="Description">Task Description</label>
             <InputTextArea class="form-control " id="Description" rows="3" maxlength="300" placeholder="Required Field. Maximum 300 characters." required @bind-Value="newTask.Description"></InputTextArea>
@@ -20,6 +22,31 @@
             <label for="DueDate">Due Date</label>
             <InputDate id="DueDate" @bind-Value="newTask.DueDate" />
         </div>
+
+        <div class="form-group">
+            <label for="Subtasks">Subtasks</label>
+            @if (newTask.Subtasks is not null)
+            {
+                foreach (SubtaskModel st in newTask.Subtasks)
+                {
+<p>@st.Description</p>}
+                }
+            <textarea id="Subtasks" @bind="newSubtask" rows="2" placeholder="Maximum 300 characters." maxlength="300"></textarea>
+            <button type="button" @onclick="AddSubtask">Add Subtask</button>
+        </div>
+        <div class="form-group">
+            <label for="Tags">Tags</label>
+            @if (newTask.Tags is not null)
+            {
+                foreach (TagModel t in newTask.Tags)
+                {
+<p>@t.Name</p>}
+                }
+            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
+            <button type="button" @onclick="AddTag">Add Tag</button>
+
+        </div>
+
         <button type="submit" class="btn btn-primary">Create</button>
         <button @onclick="Cancel" class="btn btn-danger">Cancel</button>
     </EditForm>
@@ -31,10 +58,45 @@
 
     private TaskModel newTask = new TaskModel();
 
-    private void HandleValidSubmit()
+    private string newSubtask;
+    private void AddSubtask()
     {
-        throw new NotImplementedException();
+        if (newTask.Subtasks is null)
+        {
+            newTask.Subtasks = new List<SubtaskModel>();
+        }
+        if (!String.IsNullOrWhiteSpace(newSubtask))
+        {
+            newTask.Subtasks.Add(new SubtaskModel() { Description = newSubtask });
+            newSubtask = string.Empty;
+        }
     }
 
-    async Task Cancel() => await BlazoredModal.CancelAsync();
-}
+    private string newTag;
+    private void AddTag()
+    {
+        if (newTask.Tags is null)
+        {
+            newTask.Tags = new List<TagModel>();
+        }
+        //TODO: Better validation
+        if (!String.IsNullOrWhiteSpace(newTag) && newTask.Tags.FindIndex(x => x.Name == newTag) == -1)
+        {
+            newTask.Tags.Add(new TagModel() { Name = newTag });
+            newTag = string.Empty;
+        }
+        else
+        {
+            newTag = "invalid entry.";
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+
+        _db.CreateTask(newTask);
+    }
+
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync(); }

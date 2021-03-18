@@ -26,7 +26,7 @@
             <tr>
                 <td>@t.Description</td>
                 <td>@t.Priority</td>
-                <td>@t.DueDate</td>
+                <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
                 <td>
                     @if (t.Subtasks.Count == 0)
                     {

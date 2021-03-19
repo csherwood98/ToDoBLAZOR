@@ -251,7 +251,19 @@ namespace DataAccessLibrary
             }
         }
 
-        //TODO: Could this be done without ever making a SQL query? Check if the Edit modal can access the tasklist somehow
+        public void DeleteAllCompleted()
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                connection.Execute("dbo.spTasks_DeleteAllCompleted", commandType: CommandType.StoredProcedure);
+            }
+        }
+
+
+
+
         //public TaskModel TaskById(int Id)
         //{
         //    string connectionString = _config.GetConnectionString(ConnectionStringName);
@@ -265,26 +277,5 @@ namespace DataAccessLibrary
         //    }
         //}
 
-        public async Task<List<T>> LoadData<T, U>(string sql, U parameters)
-        {
-            string connectionString = _config.GetConnectionString(ConnectionStringName);
-
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                var data = await connection.QueryAsync<T>(sql, parameters);
-
-                return data.ToList();
-            }
-        }
-
-        public async Task SaveData<T>(string sql, T parameters)
-        {
-            string connectionString = _config.GetConnectionString(ConnectionStringName);
-
-            using (IDbConnection connection = new SqlConnection(connectionString))
-            {
-                await connection.ExecuteAsync(sql, parameters);
-            }
-        }
     }
 }

@@ -9,8 +9,6 @@ namespace DataAccessLibrary
         string ConnectionStringName { get; set; }
 
         void CreateTask(TaskModel model);
-        Task<List<T>> LoadData<T, U>(string sql, U parameters);
-        Task SaveData<T>(string sql, T parameters);
         List<TagModel> Tags_GetAll();
         List<TaskModel> Tasks_GetAll();
         //TaskModel TaskById(int id);
@@ -18,5 +16,6 @@ namespace DataAccessLibrary
         void UpdateTask(TaskModel model);
         void UpdateTaskCompletion(TaskModel model);
         void UpdateSubtaskCompletion(SubtaskModel model);
+        void DeleteAllCompleted();
     }
 }

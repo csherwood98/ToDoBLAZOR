@@ -12,7 +12,7 @@
 
 <table class="table table-striped container-fluid">
     <thead>
-        <tr class="row">
+        <tr class="row text-center">
             <th class="col-sm-4">Description</th>
             <th class="col-sm-1">Priority</th>
             <th class="col-sm-1">Due Date</th>
@@ -75,8 +75,8 @@
                     </td>
                     <td class="col-sm-1">
                         <div class="btn-group">
-                            <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
-                            <button class="btn-secondary" @onclick="e=> ShowEditTask(t.Id, tasks)">Edit</button>
+                            <button class="btn-danger" @onclick="e=> OnDelete(t.Id)"><i class="far fa-trash-alt"></i></button>
+                            <button class="btn-secondary" @onclick="e=> ShowEditTask(t.Id, tasks)"><i class="far fa-edit"></i></button>
                         </div>
 
                     </td>

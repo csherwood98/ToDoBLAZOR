@@ -16,5 +16,7 @@ namespace DataAccessLibrary
         //TaskModel TaskById(int id);
         void DeleteTask(int Id);
         void UpdateTask(TaskModel model);
+        void UpdateTaskCompletion(TaskModel model);
+        void UpdateSubtaskCompletion(SubtaskModel model);
     }
 }

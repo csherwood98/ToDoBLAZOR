@@ -1,0 +1,73 @@
+﻿@page "/CompletedTasks"
+
+@using DataAccessLibrary
+@using DataAccessLibrary.Models
+
+@inject ISqlDataAccess _db
+
+<h3>Completed Tasks</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Subtasks</th>
+            <th>Tags</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in tasks)
+        {
+            if (t.CompletionFlag)
+            {
+                <tr>
+                    <td>@t.Description</td>
+                    <td>@t.Priority</td>
+                    <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
+                    <td>
+                        @if (t.Subtasks is null || t.Subtasks.Count == 0)
+                        {
+                            <ul>There are no subtasks</ul>
+                        }
+                        else
+                        {
+                            foreach (var s in t.Subtasks)
+                            {
+                                    <ul>
+                                        <li>
+                                            @s.Description
+                                        </li>
+
+                                    </ul>
+                                
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (t.Tags is null || t.Tags.Count == 0)
+                        {
+                            <ul>There are no tags</ul>
+                        }
+                        else
+                        {
+                            foreach (var tag in t.Tags)
+                            {
+                                <ul>@tag.Name</ul>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@code {
+    private List<TaskModel> tasks;
+
+    protected override void OnInitialized()
+    {
+        tasks = _db.Tasks_GetAll();
+    }
+}

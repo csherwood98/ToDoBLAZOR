@@ -223,6 +223,33 @@ namespace DataAccessLibrary
 
         }
 
+        public void UpdateTaskCompletion(TaskModel model)
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                var p = new DynamicParameters();
+                p.Add("@Id", model.Id);
+                p.Add("@CompletionFlag", model.CompletionFlag);
+
+                connection.Execute("dbo.spTasks_ChangeFlag", p, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public void UpdateSubtaskCompletion(SubtaskModel model)
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                var p = new DynamicParameters();
+                p.Add("@Id", model.Id);
+                p.Add("@CompletionFlag", model.CompletionFlag);
+
+                connection.Execute("dbo.spSubtasks_ChangeFlag", p, commandType: CommandType.StoredProcedure);
+            }
+        }
 
         //TODO: Could this be done without ever making a SQL query? Check if the Edit modal can access the tasklist somehow
         //public TaskModel TaskById(int Id)

@@ -28,7 +28,7 @@
                 <td>@t.Priority</td>
                 <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
                 <td>
-                    @if (t.Subtasks.Count == 0)
+                    @if (t.Subtasks is null || t.Subtasks.Count == 0)
                     {
                         <ul>There are no subtasks</ul>
                     }
@@ -41,7 +41,7 @@
                     }
                 </td>
                 <td>
-                    @if (t.Tags.Count == 0)
+                    @if (t.Tags is null || t.Tags.Count == 0)
                     {
                         <ul>There are no tags</ul>
                     }
@@ -54,7 +54,11 @@
                     }
                 </td>
                 <td>
-                    <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
+                    <div class="btn-group">
+                        <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
+                        <button class="btn-secondary" @onclick="e=> ShowEditTask(t.Id, tasks)">Edit</button>
+                    </div>
+
                 </td>
             </tr>
             }
@@ -80,6 +84,21 @@
     {
         _db.DeleteTask(Id);
         tasks.RemoveAll(x => x.Id == Id);
+    }
+
+    async Task ShowEditTask(int Id, List<TaskModel> tasks)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(EditTask.TaskId), Id);
+        parameters.Add(nameof(EditTask.TasksList), tasks);
+
+        var formModal = Modal.Show<EditTask>("Edit Task", parameters);
+        var result = await formModal.Result;
+        if (!result.Cancelled && result is not null)
+        {
+            TaskModel edited = (TaskModel)result.Data;
+            tasks[tasks.FindIndex(x => x.Id == edited.Id)] = edited;
+        }
     }
 
     private List<TaskModel> tasks;

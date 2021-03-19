@@ -13,7 +13,8 @@ namespace DataAccessLibrary
         Task SaveData<T>(string sql, T parameters);
         List<TagModel> Tags_GetAll();
         List<TaskModel> Tasks_GetAll();
-
+        //TaskModel TaskById(int id);
         void DeleteTask(int Id);
+        void UpdateTask(TaskModel model);
     }
 }

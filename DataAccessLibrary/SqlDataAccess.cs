@@ -177,6 +177,67 @@ namespace DataAccessLibrary
 
         }
 
+        public void UpdateTask(TaskModel model)
+        {
+            string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+            {
+                //Update the task table itself
+                UpdateTaskTable(connection, model);
+                //Delete subtasks and create the new ones
+                UpdateSubtasks(connection, model);
+                //Delink the tags from the task and create any new tags added
+                UpdateTags(connection, model);
+                //Link the newly updated tagset to the task
+                LinkTags(connection, model);
+            }
+        }
+        private void UpdateTaskTable(IDbConnection connection, TaskModel model)
+        {
+            var p = new DynamicParameters();
+            p.Add("@Id", model.Id);
+            p.Add("@Description", model.Description);
+            p.Add("@Priority", model.Priority);
+            p.Add("@DueDate", model.DueDate);
+
+            connection.Execute("dbo.spTasks_Update", p, commandType: CommandType.StoredProcedure);
+        }
+        private void UpdateSubtasks(IDbConnection connection, TaskModel model)
+        {
+            var p = new DynamicParameters();
+            p.Add("@ParentTaskId", model.Id);
+
+            connection.Execute("dbo.spSubtasks_DeleteByTask", p, commandType: CommandType.StoredProcedure);
+
+            SaveSubtasks(connection, model);
+        }
+        private void UpdateTags(IDbConnection connection, TaskModel model)
+        {
+            var p = new DynamicParameters();
+            p.Add("@id_Task", model.Id);
+
+            connection.Execute("dbo.spTaskTags_DeleteByTask", p, commandType: CommandType.StoredProcedure);
+
+            SaveTags(connection, model);
+
+        }
+
+
+        //TODO: Could this be done without ever making a SQL query? Check if the Edit modal can access the tasklist somehow
+        //public TaskModel TaskById(int Id)
+        //{
+        //    string connectionString = _config.GetConnectionString(ConnectionStringName);
+
+        //    TaskModel output = new TaskModel();
+
+        //    using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+        //    {
+        //        //This might not work??? If not, will need to set up an intermediary value to accept the one-item long list and then convert it
+        //        output = (TaskModel)connection.Query<TagModel>("dbo.spTags_GetAll");
+        //    }
+        //}
+
         public async Task<List<T>> LoadData<T, U>(string sql, U parameters)
         {
             string connectionString = _config.GetConnectionString(ConnectionStringName);

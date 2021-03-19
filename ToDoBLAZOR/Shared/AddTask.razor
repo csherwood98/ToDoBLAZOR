@@ -29,7 +29,8 @@
             {
                 foreach (SubtaskModel st in newTask.Subtasks)
                 {
-<p>@st.Description</p>}
+                        <button type="button" class="btn-danger" @onclick="e=>OnDeleteSubtask(st.Description)">rmv</button>
+                        <p>@st.Description</p>}
                 }
             <textarea id="Subtasks" @bind="newSubtask" rows="2" placeholder="Maximum 300 characters." maxlength="300"></textarea>
             <button type="button" @onclick="AddSubtask">Add Subtask</button>
@@ -40,7 +41,8 @@
             {
                 foreach (TagModel t in newTask.Tags)
                 {
-<p>@t.Name</p>}
+<button type="button" class="btn-danger" @onclick="e=>OnDeleteTag(t.Name)">rmv</button>
+                        <p>@t.Name</p>}
                 }
             <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
             <button type="button" @onclick="AddTag">Add Tag</button>
@@ -72,6 +74,16 @@
         }
     }
 
+    private void OnDeleteTag(string deleteName)
+    {
+        newTask.Tags.RemoveAll(x => x.Name == deleteName);
+    }
+
+    private void OnDeleteSubtask(string deleteDescription)
+    {
+        newTask.Subtasks.RemoveAll(x => x.Description == deleteDescription);
+    }
+
     private string newTag;
     private void AddTag()
     {
@@ -98,7 +110,5 @@
 
         BlazoredModal.CloseAsync(ModalResult.Ok(newTask));
     }
-
-
 
     async Task Cancel() => await BlazoredModal.CancelAsync(); }

@@ -1,0 +1,117 @@
+﻿@inject ISqlDataAccess _db
+<div>
+    <EditForm Model="@copyTask" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="Description">Task Description</label>
+            <InputTextArea class="form-control " id="Description" rows="3" maxlength="300" placeholder="Required Field. Maximum 300 characters." required @bind-Value="copyTask.Description"></InputTextArea>
+        </div>
+        <div class="form-group">
+            <label for="Priority">Priority</label>
+            <InputSelect class="form-control" id="Priority" @bind-Value="copyTask.Priority">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="DueDate">Due Date</label>
+            <InputDate id="DueDate" @bind-Value="copyTask.DueDate" />
+        </div>
+
+        <div class="form-group">
+            <label for="Subtasks">Subtasks</label>
+            @if (copyTask.Subtasks is not null)
+            {
+                foreach (SubtaskModel st in copyTask.Subtasks)
+                {
+                    <p>@st.Description</p>
+                    //TODO: Find a better way to handle this to allow distinct Subtasks that have the same description
+                    <button type="button" class="btn-danger" @onclick="e=>OnDeleteSubtask(st.Description)">rmv</button>
+                }
+            }
+            <textarea id="Subtasks" @bind="newSubtask" rows="2" placeholder="Maximum 300 characters." maxlength="300"></textarea>
+            <button type="button" @onclick="AddSubtask">Add Subtask</button>
+        </div>
+        <div class="form-group">
+            <label for="Tags">Tags</label>
+            @if (copyTask.Tags is not null)
+            {
+                foreach (var tag in copyTask.Tags)
+                {
+                    <button type="button" class="btn-danger" @onclick="e=>OnDeleteTag(tag.Name)">rmv</button>
+                    <p>@tag.Name</p>
+
+
+                }
+            }
+            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
+            <button type="button" @onclick="AddTag">Add Tag</button>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button @onclick="Cancel" class="btn btn-danger">Cancel</button>
+    </EditForm>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter] public TaskModel copyTask { get; set; }
+
+    private void OnDeleteTag(string deleteName)
+    {
+        copyTask.Tags.RemoveAll(x => x.Name == deleteName);
+    }
+
+    private void OnDeleteSubtask(string deleteDescription)
+    {
+        copyTask.Subtasks.RemoveAll(x => x.Description == deleteDescription);
+    }
+
+    private string newSubtask;
+    private void AddSubtask()
+    {
+        if (copyTask.Subtasks is null)
+        {
+            copyTask.Subtasks = new List<SubtaskModel>();
+        }
+        if (!String.IsNullOrWhiteSpace(newSubtask))
+        {
+            copyTask.Subtasks.Add(new SubtaskModel() { Description = newSubtask });
+            newSubtask = string.Empty;
+        }
+    }
+
+    private string newTag;
+    private void AddTag()
+    {
+        if (copyTask.Tags is null)
+        {
+            copyTask.Tags = new List<TagModel>();
+        }
+        //TODO: Better validation
+        if (!String.IsNullOrWhiteSpace(newTag) && copyTask.Tags.FindIndex(x => x.Name == newTag) == -1)
+        {
+            copyTask.Tags.Add(new TagModel() { Name = newTag });
+            newTag = string.Empty;
+        }
+        else
+        {
+            newTag = "invalid entry.";
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        _db.CreateTask(copyTask);
+
+        BlazoredModal.CloseAsync();
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}

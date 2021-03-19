@@ -98,6 +98,12 @@
     private void UpdateTaskCompletion(TaskModel t, object checkedValue)
     {
         t.CompletionFlag = (bool)checkedValue;
+        //This check is here because of the checkmark bug, can be removed if bug fixed
+        if ((bool)checkedValue)
+        {
+            t.DateCompleted = DateTime.Now;
+        }
+
         _db.UpdateTaskCompletion(t);
         //tasks.RemoveAll(x => x.CompletionFlag);
     }

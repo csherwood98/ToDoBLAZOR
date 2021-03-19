@@ -232,7 +232,7 @@ namespace DataAccessLibrary
                 var p = new DynamicParameters();
                 p.Add("@Id", model.Id);
                 p.Add("@CompletionFlag", model.CompletionFlag);
-
+                p.Add("@DateCompleted", model.DateCompleted);
                 connection.Execute("dbo.spTasks_ChangeFlag", p, commandType: CommandType.StoredProcedure);
             }
         }

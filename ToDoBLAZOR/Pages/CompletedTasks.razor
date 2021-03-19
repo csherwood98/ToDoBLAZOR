@@ -1,8 +1,8 @@
 ﻿@page "/CompletedTasks"
-
 @using DataAccessLibrary
 @using DataAccessLibrary.Models
 
+@inject NavigationManager NavManager
 @inject ISqlDataAccess _db
 
 <h3>Completed Tasks</h3>
@@ -12,7 +12,7 @@
         <tr>
             <th>Description</th>
             <th>Priority</th>
-            <th>Due Date</th>
+            <th>Date Completed</th>
             <th>Subtasks</th>
             <th>Tags</th>
         </tr>
@@ -25,7 +25,7 @@
                 <tr>
                     <td>@t.Description</td>
                     <td>@t.Priority</td>
-                    <td>@t.DueDate.ToString("yyyy/MM/dd")</td>
+                    <td>@t.DateCompleted.ToString("yyyy/MM/dd")</td>
                     <td>
                         @if (t.Subtasks is null || t.Subtasks.Count == 0)
                         {
@@ -35,13 +35,13 @@
                         {
                             foreach (var s in t.Subtasks)
                             {
-                                    <ul>
-                                        <li>
-                                            @s.Description
-                                        </li>
+                                <ul>
+                                    <li>
+                                        @s.Description
+                                    </li>
 
-                                    </ul>
-                                
+                                </ul>
+
                             }
                         }
                     </td>
@@ -58,13 +58,42 @@
                             }
                         }
                     </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
+                            <button class="btn-secondary" @onclick="e=> ShowCopyTask(t)">Copy</button>
+                        </div>
+
+                    </td>
                 </tr>
             }
         }
     </tbody>
 </table>
 @code {
+    [CascadingParameter] public IModalService Modal { get; set; }
     private List<TaskModel> tasks;
+
+    private void OnDelete(int Id)
+    {
+        _db.DeleteTask(Id);
+        tasks.RemoveAll(x => x.Id == Id);
+    }
+
+    async Task ShowCopyTask(TaskModel model)
+    {
+
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(CopyTask.copyTask), model);
+
+        var formModal = Modal.Show<CopyTask>("Copy Task", parameters);
+        var result = await formModal.Result;
+        if (!result.Cancelled)
+        {
+            NavManager.NavigateTo("/TodoList");
+        }
+
+    }
 
     protected override void OnInitialized()
     {

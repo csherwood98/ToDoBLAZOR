@@ -7,14 +7,15 @@
 
 <h3>Completed Tasks</h3>
 
-<table class="table table-striped">
+<table class="table table-striped container-fluid">
     <thead>
-        <tr>
-            <th>Description</th>
-            <th>Priority</th>
-            <th>Date Completed</th>
-            <th>Subtasks</th>
-            <th>Tags</th>
+        <tr class="row">
+            <th class="col-sm-4">Description</th>
+            <th class="col-sm-1">Priority</th>
+            <th class="col-sm-1">Date Completed</th>
+            <th class="col-sm-3">Subtasks</th>
+            <th class="col-sm-2">Tags</th>
+            <th class="col-sm-1">Buttons</th>
         </tr>
     </thead>
     <tbody>
@@ -22,11 +23,11 @@
         {
             if (t.CompletionFlag)
             {
-                <tr>
-                    <td>@t.Description</td>
-                    <td>@t.Priority</td>
-                    <td>@t.DateCompleted.ToString("yyyy/MM/dd")</td>
-                    <td>
+                <tr class="row">
+                    <td class="col-sm-4">@t.Description</td>
+                    <td class="col-sm-1">@t.Priority</td>
+                    <td class="col-sm-1">@t.DateCompleted.ToString("yyyy/MM/dd")</td>
+                    <td class="col-sm-3">
                         @if (t.Subtasks is null || t.Subtasks.Count == 0)
                         {
                             <ul>There are no subtasks</ul>
@@ -45,7 +46,7 @@
                             }
                         }
                     </td>
-                    <td>
+                    <td class="col-sm-2">
                         @if (t.Tags is null || t.Tags.Count == 0)
                         {
                             <ul>There are no tags</ul>
@@ -54,11 +55,13 @@
                         {
                             foreach (var tag in t.Tags)
                             {
-                                <ul>@tag.Name</ul>
+                                <ul>
+                                    <li>@tag.Name</li>
+                                </ul>
                             }
                         }
                     </td>
-                    <td>
+                    <td class="col-sm-1">
                         <div class="btn-group">
                             <button class="btn-danger" @onclick="e=> OnDelete(t.Id)">Delete</button>
                             <button class="btn-secondary" @onclick="e=> ShowCopyTask(t)">Copy</button>

@@ -24,13 +24,14 @@
 
         <div class="form-group">
             <label for="Subtasks">Subtasks</label>
+            <br />
             @if (copyTask.Subtasks is not null)
             {
                 foreach (SubtaskModel st in copyTask.Subtasks)
                 {
-                    <p>@st.Description</p>
                     //TODO: Find a better way to handle this to allow distinct Subtasks that have the same description
-                    <button type="button" class="btn-danger" @onclick="e=>OnDeleteSubtask(st.Description)">rmv</button>
+                    <button type="button" class="btn-outline-danger txtsmall" @onclick="e=>OnDeleteSubtask(st.Description)">@st.Description</button>
+                    <br/>
                 }
             }
             <textarea id="Subtasks" @bind="newSubtask" rows="2" placeholder="Maximum 300 characters." maxlength="300"></textarea>
@@ -38,16 +39,15 @@
         </div>
         <div class="form-group">
             <label for="Tags">Tags</label>
+            <br />
             @if (copyTask.Tags is not null)
             {
-                foreach (var tag in copyTask.Tags)
+                foreach (var t in copyTask.Tags)
                 {
-                    <button type="button" class="btn-danger" @onclick="e=>OnDeleteTag(tag.Name)">rmv</button>
-                    <p>@tag.Name</p>
-
-
+                    <button type="button" class="txtsmall btn-outline-danger" @onclick="e=>OnDeleteTag(t.Name)">@t.Name</button>
                 }
             }
+            <br />
             <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
             <button type="button" @onclick="AddTag">Add Tag</button>
 

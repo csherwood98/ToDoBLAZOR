@@ -16,6 +16,8 @@ namespace DataAccessLibrary.Models
         /// <summary>
         /// Full description of what the task is, for display purposes. Limit 300 char in MySql database.
         /// </summary>
+        
+        [Required(ErrorMessage = "A Task Description is required.")]
         [StringLength(300, ErrorMessage = "Keep description under 300 characters.")]
         public string Description { get; set; }
         /// <summary>

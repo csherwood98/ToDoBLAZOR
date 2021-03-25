@@ -6,7 +6,7 @@
         <ValidationSummary />
         <div class="form-group">
             <label for="Description">Task Description</label>
-            <InputTextArea class="form-control " id="Description" rows="3" maxlength="300" placeholder="Required Field. Maximum 300 characters." required @bind-Value="newTask.Description"></InputTextArea>
+            <InputTextArea class="form-control " id="Description" rows="3" maxlength="300" placeholder="Required Field. Maximum 300 characters." @bind-Value="newTask.Description"></InputTextArea>
         </div>
         <div class="form-group">
             <label for="Priority">Priority</label>
@@ -49,7 +49,7 @@
 
                 }
             <br />
-            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
+            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="@TagPlaceholder" />
             <button type="button" @onclick="AddTag">Add Tag</button>
 
         </div>
@@ -64,6 +64,7 @@
 @code { [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
 
     private TaskModel newTask = new TaskModel();
+    private string TagPlaceholder = "Maximum 100 characters.";
 
     private string newSubtask;
     private void AddSubtask()
@@ -104,7 +105,8 @@
         }
         else
         {
-            newTag = "invalid entry.";
+            newTag = string.Empty;
+            TagPlaceholder = "Invalid entry.";
         }
     }
 

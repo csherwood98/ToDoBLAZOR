@@ -185,7 +185,7 @@ namespace DataAccessLibrary
             {
                 //Update the task table itself
                 UpdateTaskTable(connection, model);
-                //Delete subtasks and create the new ones
+                //Delete subtasks and create the new ones. (This is the simplest way to do it with little to no cost in efficiency.)
                 UpdateSubtasks(connection, model);
                 //Delink the tags from the task and create any new tags added
                 UpdateTags(connection, model);
@@ -207,7 +207,6 @@ namespace DataAccessLibrary
         {
             var p = new DynamicParameters();
             p.Add("@ParentTaskId", model.Id);
-
             connection.Execute("dbo.spSubtasks_DeleteByTask", p, commandType: CommandType.StoredProcedure);
 
             SaveSubtasks(connection, model);

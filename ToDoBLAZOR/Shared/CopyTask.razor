@@ -48,7 +48,7 @@
                 }
             }
             <br />
-            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="Maximum 100 characters." />
+            <input type="text" id="Tags" @bind="newTag" maxlength="100" placeholder="@TagPlaceholder" />
             <button type="button" @onclick="AddTag">Add Tag</button>
 
         </div>
@@ -62,6 +62,7 @@
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
 
     [Parameter] public TaskModel copyTask { get; set; }
+    private string TagPlaceholder = "Maximum 100 characters.";
 
     private void OnDeleteTag(string deleteName)
     {
@@ -102,7 +103,8 @@
         }
         else
         {
-            newTag = "invalid entry.";
+            newTag = string.Empty;
+            TagPlaceholder = "Invalid entry.";
         }
     }
 

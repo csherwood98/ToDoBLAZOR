@@ -17,4 +17,20 @@ namespace DataAccessLibrary.Models
         /// </summary>
         public string Name { get; set; }
     }
+
+    public class TagComparer : IEqualityComparer<TagModel>
+    {
+        public bool Equals(TagModel x, TagModel y)
+        {
+            if (x.Id == y.Id && x.Name.ToLower() == y.Name.ToLower())
+                return true;
+            return false;
+
+
+        }
+        public int GetHashCode(TagModel obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
 }

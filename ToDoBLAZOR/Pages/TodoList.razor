@@ -8,6 +8,16 @@
 <h3>Todo List</h3>
 
 <button @onclick="AddModal" class="btn btn-primary">Add Task</button>
+<EditForm Model="@searchTag">
+    <InputSelect @bind-Value="searchTag.Name">
+        <option value=""></option>
+        @foreach(TagModel tag in extantTags)
+                    {
+                        <option>@tag.Name</option>
+                    }
+    </InputSelect>
+    <button type="button" @onclick="SearchTags">Search By Tag</button>
+</EditForm>
 
 
 <table class="table table-striped container-fluid">
@@ -24,7 +34,8 @@
     <tbody>
         @foreach (var t in tasks)
         {
-            if (!t.CompletionFlag)
+            //Checks that the tag is not complete, then if a valid tagsearch is going on if the tagLimiter is one of the tags on the task.
+            if (!t.CompletionFlag && (tagLimiter is null || t.Tags.Contains(tagLimiter, new TagComparer())))
             {
                 <tr class="row">
                     <td class="col-sm-4">
@@ -89,6 +100,8 @@
 
 @code {
     [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter] public TagModel searchTag { get; set; } = new TagModel();
+
 
     async Task AddModal()
     {
@@ -142,10 +155,31 @@
     }
 
     private List<TaskModel> tasks;
+    private List<TagModel> extantTags;
+    private TagModel tagLimiter;
+
+    private void SearchTags()
+    {
+        int searchTagIndex = extantTags.FindIndex(x => x.Name == searchTag.Name);
+        bool tagNullcheck = String.IsNullOrWhiteSpace(searchTag.Name);
+        if (!tagNullcheck && searchTagIndex != -1)
+        {
+            tagLimiter = extantTags[searchTagIndex];
+        }
+        //Resets tagLimiter to null, returns all displayable tasks.
+        if (tagNullcheck)
+        {
+            tagLimiter = null;
+        }
+    }
 
     protected override void OnInitialized()
     {
         tasks = _db.Tasks_GetAll();
         tasks = tasks.Where(x => x.CompletionFlag == false).ToList();
+        //TODO: Change to only get tags that are applied to EXISTING tasks.
+        //TODO: Add a place to delete excess tags
+        //TODO: Add a message when there is nothing to display.
+        extantTags = _db.Tags_GetAll();
     }
 }

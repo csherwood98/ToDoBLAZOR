@@ -35,7 +35,7 @@
         @foreach (var t in tasks)
         {
             //Checks that the tag is not complete, then if a valid tagsearch is going on if the tagLimiter is one of the tags on the task.
-            if (!t.CompletionFlag && (tagLimiter is null || t.Tags.Contains(tagLimiter, new TagComparer())))
+            if (!t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
             {
                 <tr class="row">
                     <td class="col-sm-4">

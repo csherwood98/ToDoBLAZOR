@@ -1,0 +1,127 @@
+﻿@page "/ToDoListTest"
+
+@using DataAccessLibrary
+@using DataAccessLibrary.Models
+
+@inject ISqlDataAccess _db
+
+<h3>ToDoListCardTest</h3>
+
+<button @onclick="AddModal" class="btn btn-primary">Add Task</button>
+<EditForm Model="@searchTag">
+    <InputSelect @bind-Value="searchTag.Name">
+        <option value=""></option>
+        @foreach (TagModel tag in extantTags)
+        {
+            <option>@tag.Name</option>
+        }
+    </InputSelect>
+    <button type="button" @onclick="SearchTags">Search By Tag</button>
+</EditForm>
+
+@foreach (var t in tasks)
+{
+    if (!t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
+    {
+        <div class="card w-75">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <input type="checkbox" @onchange="e=> UpdateTaskCompletion(t, e.Value)" />
+                    @t.Description
+                </h5>
+                @if (t.Subtasks is null || t.Subtasks.Count == 0)
+                {
+                    <p>There are no subtasks</p>
+                }
+                else
+                {
+                    foreach (var s in t.Subtasks)
+                    {
+                        if (!s.CompletionFlag)
+                        {
+                            //TODO: Currently issue exists where if non-last is checked, it is removed properly but new list has the one in its former position automatically checked
+                            <ul>
+                                <li>
+                                    <input type="checkbox" @onchange="e=> UpdateSubtaskCompletion(t, s, e.Value)" />
+                                    @s.Description
+                                </li>
+
+                            </ul>
+                        }
+                    }
+                }
+
+                @if (t.Tags is not null && t.Tags.Count != 0)
+                {
+                    //Need to add fuller version of Bootstrap, popper to use dropdown menu if that is what I want to use.
+
+
+                }
+
+            </div>
+        </div>
+        <br />
+    }
+}
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter] public TagModel searchTag { get; set; } = new TagModel();
+
+    private List<TaskModel> tasks;
+    private List<TagModel> extantTags;
+    private TagModel tagLimiter;
+
+    protected override void OnInitialized()
+    {
+        tasks = _db.Tasks_GetAll();
+        tasks = tasks.Where(x => x.CompletionFlag == false).ToList();
+        extantTags = _db.Tags_GetAll();
+    }
+
+    async Task AddModal()
+    {
+        var formModal = Modal.Show<AddTask>("Add Model");
+        var result = await formModal.Result;
+        if (!result.Cancelled && result is not null)
+        {
+            tasks.Add((TaskModel)result.Data);
+        }
+    }
+
+    private void UpdateTaskCompletion(TaskModel t, object checkedValue)
+    {
+        t.CompletionFlag = (bool)checkedValue;
+        //This check is here because of the checkmark bug, can be removed if bug fixed
+        if ((bool)checkedValue)
+        {
+            t.DateCompleted = DateTime.Now;
+        }
+
+        _db.UpdateTaskCompletion(t);
+        //tasks.RemoveAll(x => x.CompletionFlag);
+    }
+
+    private void UpdateSubtaskCompletion(TaskModel t, SubtaskModel s, object checkedValue)
+    {
+        t.Subtasks[t.Subtasks.FindIndex(x => x == s)].CompletionFlag = (bool)checkedValue;
+        _db.UpdateSubtaskCompletion(s);
+        //t.Subtasks.RemoveAll(x => x.CompletionFlag);
+    }
+
+    private void SearchTags()
+    {
+        int searchTagIndex = extantTags.FindIndex(x => x.Name == searchTag.Name);
+        bool tagNullcheck = String.IsNullOrWhiteSpace(searchTag.Name);
+        if (!tagNullcheck && searchTagIndex != -1)
+        {
+            tagLimiter = extantTags[searchTagIndex];
+        }
+        //Resets tagLimiter to null, returns all displayable tasks.
+        if (tagNullcheck)
+        {
+            tagLimiter = null;
+        }
+    }
+}

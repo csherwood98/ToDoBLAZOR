@@ -16,6 +16,15 @@ ul.no-bullet {
     list-style-type: none;
 }
 
+.pendingTask {
+    background-color: #81f7b4;
+}
+
+.overdueTask {
+    background-color: #f76f8b;
+}
+
+
 .bullet-checkmark {
     margin-right: 0.8em;
 }

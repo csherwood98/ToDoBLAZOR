@@ -23,7 +23,7 @@
 {
     if (!t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
     {
-        <div class="card w-75">
+        <div class="card w-75 @ColorPicker(t)">
             <div class="card-body">
                 <h5 class="card-title">
                     <input type="checkbox" @onchange="e=> UpdateTaskCompletion(t, e.Value)" />
@@ -124,6 +124,19 @@
         if (tagNullcheck)
         {
             tagLimiter = null;
+        }
+    }
+
+    private string ColorPicker(TaskModel t)
+    {
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        if (dateTimeComp >= 0)
+        {
+            return "pendingTask";
+        }
+        else
+        {
+            return "overdueTask";
         }
     }
 }

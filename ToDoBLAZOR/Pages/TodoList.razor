@@ -16,7 +16,13 @@
                         <option>@tag.Name</option>
                     }
     </InputSelect>
-    <button type="button" @onclick="SearchTags">Search By Tag</button>
+    <button type="button" @onclick="SearchTags">Show By Tag</button>
+    <InputSelect @bind-Value="sortBy">
+        <option value=""></option>
+        <option value="Priority">Priority</option>
+        <option value="Due Date">Due Date</option>
+    </InputSelect>
+    <button type="button" @onclick="SortTasks">Sort By</button>
 </EditForm>
 
 
@@ -101,7 +107,7 @@
 @code {
     [CascadingParameter] public IModalService Modal { get; set; }
     [Parameter] public TagModel searchTag { get; set; } = new TagModel();
-
+    [Parameter] public string sortBy { get; set; }
 
     async Task AddModal()
     {
@@ -171,6 +177,22 @@
         {
             tagLimiter = null;
         }
+    }
+
+    private void SortTasks()
+    {
+        if (String.IsNullOrWhiteSpace(sortBy))
+        {
+            return;
+        }
+        else if (sortBy == "Priority")
+            {
+            tasks = tasks.OrderByDescending(x => x.Priority).ThenBy(x => x.DueDate.Date).ToList();
+            }
+        else if (sortBy == "Due Date")
+            {
+            tasks = tasks.OrderByDescending(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
+            }
     }
 
     protected override void OnInitialized()

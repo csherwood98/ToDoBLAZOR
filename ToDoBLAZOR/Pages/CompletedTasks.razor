@@ -8,7 +8,7 @@
 <h3>Completed Tasks</h3>
 
 <button @onclick="OnDeleteAll" class="btn btn-danger">Delete All</button>
-<table class="table table-striped container-fluid">
+<table class="table container-fluid">
     <thead>
         <tr class="row text-center">
             <th class="col-sm-4">Description</th>
@@ -24,7 +24,7 @@
         {
             if (t.CompletionFlag)
             {
-                <tr class="row">
+                <tr class="row @ColorPicker(t)">
                     <td class="col-sm-4">@t.Description</td>
                     <td class="col-sm-1">@t.Priority</td>
                     <td class="col-sm-1">@t.DateCompleted.ToString("yyyy/MM/dd")</td>
@@ -102,6 +102,19 @@
             NavManager.NavigateTo("/TodoList");
         }
 
+    }
+
+    private string ColorPicker(TaskModel t)
+    {
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        if (dateTimeComp >= 0)
+        {
+            return "successfulTask";
+        }
+        else
+        {
+            return "overdueTask";
+        }
     }
 
     protected override void OnInitialized()

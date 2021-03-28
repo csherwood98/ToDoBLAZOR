@@ -26,7 +26,7 @@
 </EditForm>
 
 
-<table class="table table-striped container-fluid">
+<table class="table container-fluid">
     <thead>
         <tr class="row text-center">
             <th class="col-sm-4">Description</th>
@@ -43,7 +43,7 @@
             //Checks that the tag is not complete, then if a valid tagsearch is going on if the tagLimiter is one of the tags on the task.
             if (!t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
             {
-                <tr class="row">
+                <tr class="row @ColorPicker(t)">
                     <td class="col-sm-4">
                         <input type="checkbox" @onchange="e=> UpdateTaskCompletion(t, e.Value)" />
                         @t.Description
@@ -186,13 +186,26 @@
             return;
         }
         else if (sortBy == "Priority")
-            {
+        {
             tasks = tasks.OrderByDescending(x => x.Priority).ThenBy(x => x.DueDate.Date).ToList();
-            }
+        }
         else if (sortBy == "Due Date")
-            {
+        {
             tasks = tasks.OrderByDescending(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
-            }
+        }
+    }
+
+    private string ColorPicker(TaskModel t)
+    {
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        if (dateTimeComp >= 0)
+        {
+            return "pendingTask";
+        }
+        else
+        {
+            return "overdueTask";
+        }
     }
 
     protected override void OnInitialized()

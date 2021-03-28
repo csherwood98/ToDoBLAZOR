@@ -17,11 +17,15 @@ ul.no-bullet {
 }
 
 .pendingTask {
-    background-color: #81f7b4;
+    background-color: #80d4ff;
 }
 
 .overdueTask {
     background-color: #f76f8b;
+}
+
+.successfulTask {
+    background-color: #7dffa2;
 }
 
 

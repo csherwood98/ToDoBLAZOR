@@ -12,6 +12,14 @@ a, .btn-link {
     font-size: 0.8rem;
 }
 
+ul.no-bullet {
+    list-style-type: none;
+}
+
+.bullet-checkmark {
+    margin-right: 0.8em;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;

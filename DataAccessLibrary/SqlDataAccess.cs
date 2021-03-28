@@ -172,9 +172,9 @@ namespace DataAccessLibrary
                 p.Add("@Id", Id);
 
                 connection.Execute("dbo.spTasks_DeleteById", p, commandType: CommandType.StoredProcedure);
+
+                DeleteUnusedTags(connection);
             }
-
-
         }
 
         public void UpdateTask(TaskModel model)
@@ -191,6 +191,8 @@ namespace DataAccessLibrary
                 UpdateTags(connection, model);
                 //Link the newly updated tagset to the task
                 LinkTags(connection, model);
+                //Delete Tags that have no links
+                DeleteUnusedTags(connection);
             }
         }
         private void UpdateTaskTable(IDbConnection connection, TaskModel model)
@@ -220,6 +222,10 @@ namespace DataAccessLibrary
 
             SaveTags(connection, model);
 
+        }
+        private void DeleteUnusedTags(IDbConnection connection)
+        {
+            connection.Execute("dbo.sp_Tags_DeleteUnused", commandType: CommandType.StoredProcedure);
         }
 
         public void UpdateTaskCompletion(TaskModel model)

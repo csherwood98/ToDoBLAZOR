@@ -25,8 +25,9 @@ namespace DataAccessLibrary.Models
         /// </summary>
         public int Priority { get; set; }
         /// <summary>
-        /// The assigned due date of the task, optional.
+        /// The assigned due date of the task, may be emtpy.
         /// </summary>
+        //TODO: Change all areas where DueDate occurs to be optional-- require you to check off that you want to add due date to do so or other method.
         public DateTimeOffset DueDate { get; set; }
         /// <summary>
         /// Set to true if task was completed.

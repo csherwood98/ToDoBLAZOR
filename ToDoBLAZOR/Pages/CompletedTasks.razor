@@ -8,6 +8,25 @@
 <h3>Completed Tasks</h3>
 
 <button @onclick="OnDeleteAll" class="btn btn-danger">Delete All</button>
+
+<EditForm Model="@searchTag">
+    <InputSelect @bind-Value="searchTag.Name">
+        <option value=""></option>
+        @foreach (TagModel tag in extantTags)
+        {
+            <option>@tag.Name</option>
+        }
+    </InputSelect>
+    <button type="button" @onclick="SearchTags">Show By Tag</button>
+
+    <InputSelect @bind-Value="sortBy">
+        <option value=""></option>
+        <option value="Priority">Priority</option>
+        <option value="Date Completed">Date Completed</option>
+    </InputSelect>
+    <button type="button" @onclick="SortTasks">Sort By</button>
+</EditForm>
+
 <table class="table container-fluid">
     <thead>
         <tr class="row text-center">
@@ -22,7 +41,7 @@
     <tbody>
         @foreach (var t in tasks)
         {
-            if (t.CompletionFlag)
+            if (t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
             {
                 <tr class="row @ColorPicker(t)">
                     <td class="col-sm-4">@t.Description</td>
@@ -76,7 +95,12 @@
 </table>
 @code {
     [CascadingParameter] public IModalService Modal { get; set; }
+    [Parameter] public TagModel searchTag { get; set; } = new TagModel();
+    [Parameter] public string sortBy { get; set; }
+
     private List<TaskModel> tasks;
+    private List<TagModel> extantTags;
+    private TagModel tagLimiter;
 
     private void OnDelete(int Id)
     {
@@ -104,9 +128,40 @@
 
     }
 
+    private void SearchTags()
+    {
+        int searchTagIndex = extantTags.FindIndex(x => x.Name == searchTag.Name);
+        bool tagNullcheck = String.IsNullOrWhiteSpace(searchTag.Name);
+        if (!tagNullcheck && searchTagIndex != -1)
+        {
+            tagLimiter = extantTags[searchTagIndex];
+        }
+        //Resets tagLimiter to null, returns all displayable tasks.
+        if (tagNullcheck)
+        {
+            tagLimiter = null;
+        }
+    }
+
+    private void SortTasks()
+    {
+        if (String.IsNullOrWhiteSpace(sortBy))
+        {
+            return;
+        }
+        else if (sortBy == "Priority")
+        {
+            tasks = tasks.OrderByDescending(x => x.Priority).ThenBy(x => x.DateCompleted.Date).ToList();
+        }
+        else if (sortBy == "Date Completed")
+        {
+            tasks = tasks.OrderByDescending(x => x.DateCompleted.Date).ThenBy(x => x.Priority).ToList();
+        }
+    }
+
     private string ColorPicker(TaskModel t)
     {
-        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate.Date, t.DateCompleted.Date);
         if (dateTimeComp >= 0)
         {
             return "successfulTask";
@@ -120,5 +175,7 @@
     protected override void OnInitialized()
     {
         tasks = _db.Tasks_GetAll();
+        tasks = tasks.Where(x => x.CompletionFlag).ToList();
+        extantTags = _db.Tags_GetAll();
     }
 }

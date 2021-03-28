@@ -197,7 +197,7 @@
 
     private string ColorPicker(TaskModel t)
     {
-        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate.Date, DateTimeOffset.Now.Date);
         if (dateTimeComp >= 0)
         {
             return "pendingTask";

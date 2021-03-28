@@ -1,3 +1,13 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using DataAccessLibrary
+@using DataAccessLibrary.Models
+
+@inject ISqlDataAccess _db
+
+<h3>Welcome!</h3>
+
+<p>This program is divided into three sections. The Todo List and Todo List Card sections allow you to create, edit, delete, and view tasks. They are
+    connected and the only difference between the two is how they are displayed. The Completed Tasks section allows you to look at tasks you have
+    already completed and either delete them permanently or use them as a template to create a new task.</p>
+

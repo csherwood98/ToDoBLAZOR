@@ -115,7 +115,13 @@
         var result = await formModal.Result;
         if (!result.Cancelled && result is not null)
         {
-            tasks.Add((TaskModel)result.Data);
+            TaskModel newTask = (TaskModel)result.Data;
+            tasks.Add(newTask);
+            //Adds tag to tag search list without requiring you to leave/refresh page
+            if (newTask.Tags is not null && newTask.Tags.Count > 0)
+            {
+                extantTags = extantTags.Union(newTask.Tags, new TagComparer()).ToList();
+            }
         }
     }
 
@@ -143,6 +149,8 @@
     {
         _db.DeleteTask(Id);
         tasks.RemoveAll(x => x.Id == Id);
+        //TODO: If this shows any speed/server-resource issues, refine to do this operation entirely client-side
+        extantTags = _db.Tags_GetAll();
     }
 
     async Task ShowEditTask(int Id, List<TaskModel> tasks)
@@ -157,6 +165,8 @@
         {
             TaskModel edited = (TaskModel)result.Data;
             tasks[tasks.FindIndex(x => x.Id == edited.Id)] = edited;
+            //TODO: If this shows any speed/server-resource issues, refine to do this operation entirely client-side
+            extantTags = _db.Tags_GetAll();
         }
     }
 

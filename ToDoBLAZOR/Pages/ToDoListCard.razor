@@ -64,14 +64,14 @@
 
 
                 }
-            <div class="d-flex justify-content-between">
-                <div>Due: @t.DueDate.ToString("yyyy/MM/dd")</div>
-                <div class="btn-group btn-group-sm">
-                    <button class="btn btn-danger" @onclick="e=> OnDelete(t.Id)">Delete <i class="fas fa-trash-alt"></i></button>
-                    <button class="btn btn-secondary" @onclick="e=> ShowEditTask(t.Id, tasks)">Edit <i class="fas fa-edit"></i></button>
-                </div>
+                <div class="d-flex justify-content-between">
+                    <div>Due: @t.DueDate.ToString("yyyy/MM/dd")</div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-danger" @onclick="e=> OnDelete(t.Id)">Delete <i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-secondary" @onclick="e=> ShowEditTask(t.Id, tasks)">Edit <i class="fas fa-edit"></i></button>
+                    </div>
 
-            </div>
+                </div>
 
 
             </div>
@@ -103,7 +103,13 @@
         var result = await formModal.Result;
         if (!result.Cancelled && result is not null)
         {
-            tasks.Add((TaskModel)result.Data);
+            TaskModel newTask = (TaskModel)result.Data;
+            tasks.Add(newTask);
+            //Adds tag to tag search list without requiring you to leave/refresh page
+            if (newTask.Tags is not null && newTask.Tags.Count > 0)
+            {
+                extantTags = extantTags.Union(newTask.Tags, new TagComparer()).ToList();
+            }
         }
     }
 
@@ -131,6 +137,8 @@
     {
         _db.DeleteTask(Id);
         tasks.RemoveAll(x => x.Id == Id);
+        //TODO: If this shows any speed/server-resource issues, refine to do this operation entirely client-side
+        extantTags = _db.Tags_GetAll();
     }
 
     async Task ShowEditTask(int Id, List<TaskModel> tasks)
@@ -145,6 +153,8 @@
         {
             TaskModel edited = (TaskModel)result.Data;
             tasks[tasks.FindIndex(x => x.Id == edited.Id)] = edited;
+            //TODO: If this shows any speed/server-resource issues, refine to do this operation entirely client-side
+            extantTags = _db.Tags_GetAll();
         }
     }
 
@@ -181,7 +191,7 @@
 
     private string ColorPicker(TaskModel t)
     {
-        int dateTimeComp = DateTimeOffset.Compare(t.DueDate, DateTimeOffset.Now);
+        int dateTimeComp = DateTimeOffset.Compare(t.DueDate.Date, DateTimeOffset.Now.Date);
         if (dateTimeComp >= 0)
         {
             return "pendingTask border-dark";

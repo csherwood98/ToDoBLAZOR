@@ -201,7 +201,7 @@
         }
         else if (sortBy == "Due Date")
         {
-            tasks = tasks.OrderByDescending(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
+            tasks = tasks.OrderBy(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
         }
     }
 

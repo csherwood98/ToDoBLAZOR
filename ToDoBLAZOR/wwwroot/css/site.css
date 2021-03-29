@@ -12,6 +12,10 @@ a, .btn-link {
     font-size: 0.8rem;
 }
 
+ul {
+    margin-bottom: 2px;
+}
+
 ul.no-bullet {
     list-style-type: none;
 }

@@ -31,8 +31,8 @@
     if (!t.CompletionFlag && (tagLimiter is null || (t.Tags is not null && t.Tags.Contains(tagLimiter, new TagComparer()))))
     {
         <div class="card w-75 @ColorPicker(t)">
-            <div class="card-body">
-                <h5 class="card-title">
+            <div class="card-body mb-1">
+                <h5 class="card-title mb-0">
                     <input type="checkbox" @onchange="e=> UpdateTaskCompletion(t, e.Value)" />
                     @t.Description
                 </h5>
@@ -47,7 +47,7 @@
                         if (!s.CompletionFlag)
                         {
                             //TODO: Currently issue exists where if non-last is checked, it is removed properly but new list has the one in its former position automatically checked
-                            <ul class="no-bullet">
+                            <ul class="no-bullet txtsmall">
                                 <li>
                                     <input type="checkbox" @onchange="e=> UpdateSubtaskCompletion(t, s, e.Value)" />
                                     @s.Description
@@ -64,7 +64,7 @@
 
 
                 }
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mt-1">
                     <div>Due: @t.DueDate.ToString("yyyy/MM/dd")</div>
                     <div class="btn-group btn-group-sm">
                         <button class="btn btn-danger" @onclick="e=> OnDelete(t.Id)">Delete <i class="fas fa-trash-alt"></i></button>
@@ -185,7 +185,7 @@
         }
         else if (sortBy == "Due Date")
         {
-            tasks = tasks.OrderByDescending(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
+            tasks = tasks.OrderBy(x => x.DueDate.Date).ThenBy(x => x.Priority).ToList();
         }
     }
 

@@ -155,7 +155,7 @@
         }
         else if (sortBy == "Date Completed")
         {
-            tasks = tasks.OrderByDescending(x => x.DateCompleted.Date).ThenBy(x => x.Priority).ToList();
+            tasks = tasks.OrderBy(x => x.DateCompleted.Date).ThenBy(x => x.Priority).ToList();
         }
     }
 
